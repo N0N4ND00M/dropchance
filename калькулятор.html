@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Drop Chance Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at center, #1f1f2e, #0c0c15);
+      font-family: 'Orbitron', sans-serif;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #00ffe0;
+      text-shadow: 0 0 10px #00ffe0;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00ffe0;
+      border-radius: 20px;
+      padding: 2em;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 20px #00ffe099;
+    }
+    input {
+      width: 100%;
+      padding: 1em;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-bottom: 1em;
+      background: #2a2a3d;
+      color: #ffffff;
+    }
+    button {
+      width: 100%;
+      padding: 1em;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #00ffe0, #0077ff);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .result {
+      margin-top: 2em;
+      font-size: 1.1rem;
+    }
+    ul {
+      padding-left: 1.2em;
+    }
+    li {
+      margin-bottom: 0.5em;
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .container {
+        padding: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 Drop Chance</h1>
+  <div class="container">
+    <input type="number" id="chance" step="0.00001" placeholder="Шанс в % (например, 0.00049)" />
+    <button onclick="calculate()">Посчитать</button>
+    <div class="result" id="output"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const chancePercent = parseFloat(document.getElementById('chance').value);
+      const p = chancePercent / 100;
+
+      if (isNaN(p) || p <= 0 || p >= 1) {
+        document.getElementById('output').innerHTML = "⚠️ Введи корректный шанс от 0 до 100!";
+        return;
+      }
+
+      function tries(prob) {
+        return Math.ceil(Math.log(1 - prob) / Math.log(1 - p));
+      }
+
+      const oneInX = p > 0 ? Math.round(1 / p).toLocaleString('ru-RU') : '∞';
+      const probabilities = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99];
+      let resultHtml = `<p>🎲 Шанс: <b>1 к ${oneInX}</b></p><p>🔮 Чтобы получить дроп с шансом <b>${chancePercent}%</b>:</p><ul>`;
+
+      probabilities.forEach(prob => {
+        const attempts = tries(prob);
+        const percent = Math.round(prob * 100);
+        const emoji = percent >= 99 ? '🌌' : percent >= 95 ? '✨' : percent >= 90 ? '🚀' : percent >= 80 ? '🔥' : percent >= 70 ? '🌟' : percent >= 60 ? '⚡' : percent >= 50 ? '💫' : '🎯';
+        resultHtml += `<li>${emoji} <b>${percent}%</b> шанс — <b>${attempts.toLocaleString('ru-RU')}</b> попыток</li>`;
+      });
+
+      resultHtml += '</ul>';
+      document.getElementById('output').innerHTML = resultHtml;
+    }
+  </script>
+</body>
+</html>
